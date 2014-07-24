@@ -48,4 +48,4 @@ def hot1():
     return render_template('hot1.html', active_tool=('热度分析', '热度分析1'))
 
 if __name__ == '__main__':
-    app.run(debug=app.config.get('DEBUG'))
+    app.run()
