@@ -1,4 +1,8 @@
+
 {% extends 'layout.html' %}
 {% block stat_panel %}
-<img src="http://ihome.ust.hk/~jwual/pingan/hotness.png" alt="" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="{{ url_for('static', filename='chartkick.js') }}"></script>  
+{% line_chart data with library={"title": {"text": title_t}} %}
 {% endblock %}
