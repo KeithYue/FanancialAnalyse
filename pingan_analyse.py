@@ -50,6 +50,11 @@ def analyse(function_name):
         for sub_t in t['sub_func']:
             if function_name == sub_t['url'].split('/')[-1]:
                 return render_template(sub_t['url'].split('/')[-1]+'.html', active_tool=(t['name'], sub_t['name']))
+    abort(404)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return '404', 404
 
 
 if __name__ == '__main__':
