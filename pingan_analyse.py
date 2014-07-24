@@ -43,9 +43,15 @@ def teardown_request(exception):
 def hello():
     return render_template('layout.html', active_tool=None)
 
-@app.route('/hot1')
-def hot1():
-    return render_template('hot1.html', active_tool=('热度分析', '热度分析1'))
+@app.route('/<function_name>')
+def analyse(function_name):
+    tools = app.config.get('TOOL_META')
+    for t in tools:
+        for sub_t in t['sub_func']:
+            if function_name == sub_t['url'].split('/')[-1]:
+                return render_template(sub_t['url'].split('/')[-1]+'.html', active_tool=(t['name'], sub_t['name']))
+
 
 if __name__ == '__main__':
-    app.run()
+    print(globals())
+    app.run(debug=app.config.get('DEBUG'))
