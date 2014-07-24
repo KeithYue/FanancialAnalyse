@@ -1,6 +1,8 @@
 # coding=utf-8
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, Blueprint
 from pymongo import MongoClient
+import chartkick
+
 # configuration
 DB_HOST = '183.57.42.116'
 DB_PORT = '27017'
@@ -29,6 +31,9 @@ app = Flask(__name__)
 # load the config file
 app.config.from_object(__name__)
 
+ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
+app.register_blueprint(ck, url_prefix='/ck')
+app.jinja_env.add_extension("chartkick.ext.charts")
 
 
 def connect_db():
@@ -65,8 +70,25 @@ def analyse(function_name):
     abort(404)
     return
 
+@app.route('/hot1',methods=['POST'])
 def hot1():
-    return render_template('hot1.html')
+    product="平安银行"
+    product_no = 1
+    if request.method == 'POST':
+        product = request.form['keyWordsBox']
+        product_no += app.config.get('KEYWORDS').index(product)
+    data = {}
+    f = open("word_count.txt")
+    while True:
+        line = f.readline()
+        if len(line) == 0:
+            break
+        tmp = line.strip('\n').split(' ')
+
+        if int(tmp[0]) == product_no:
+            data[tmp[1]] = int(tmp[2])
+    f.close()
+    return render_template('hot1.html',data=data, title_t=product)
 
 def related1():
     return render_template('related1.html')
