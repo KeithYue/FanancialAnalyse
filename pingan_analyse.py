@@ -14,6 +14,14 @@ TOOL_META.append(dict(name='相关词分析', sub_func=[dict(name='相关分析1
 TOOL_META.append(dict(name='来源分析', sub_func=[dict(name='来源分析1', url='/source1')]))
 TOOL_META.append(dict(name='情感分析', sub_func=[dict(name='情感分析1', url='/sentiment1')]))
 TOOL_META.append(dict(name='话题分析', sub_func=[dict(name='话题分析1', url='/topic1')]))
+KEYWORDS = [
+        '平安银行',
+        '平安盈',
+        '基金智能定投',
+        '金橙管家',
+        '新一贷',
+        '口袋银行'
+]
 
 # init the app
 app = Flask(__name__)
@@ -33,6 +41,7 @@ def connect_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
+    g.active_tool = None
 
 @app.teardown_request
 def teardown_request(exception):
@@ -41,7 +50,8 @@ def teardown_request(exception):
 
 @app.route('/')
 def hello():
-    return render_template('layout.html', active_tool=None)
+    g.active_tool = None
+    return render_template('layout.html')
 
 @app.route('/<function_name>')
 def analyse(function_name):
@@ -49,8 +59,25 @@ def analyse(function_name):
     for t in tools:
         for sub_t in t['sub_func']:
             if function_name == sub_t['url'].split('/')[-1]:
-                return render_template(sub_t['url'].split('/')[-1]+'.html', active_tool=(t['name'], sub_t['name']))
+                # invoke the related method
+                g.active_tool = (t['name'], sub_t['name'])
+                return globals()[function_name]()
     abort(404)
+    return
+
+def hot1():
+    return render_template('hot1.html')
+
+def related1():
+    return render_template('related1.html')
+
+def sentiment1():
+    return render_template('sentiment1.html')
+
+def source1():
+    return render_template('source1.html')
+
+
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -58,5 +85,4 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
-    print(globals())
     app.run(debug=app.config.get('DEBUG'))
