@@ -1,1 +1,1 @@
-web: python pingan_analyse.py
+web: gunicorn pingan_analyse:app --log-file=-
